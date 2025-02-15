@@ -14,6 +14,13 @@ local isSpeedOn = false
 local CONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
 local speed = 1
 local noclipSpeed = 10
+game:GetService("StarterGui"):SetCore("SendNotification", {
+    Title = "УСПЕШНО",
+    Text = "Успешный инжект скрипта!",
+    Icon = "rbxassetid://7229442422",  
+    Duration = 8  
+})
+
 function startFlying(vflySpeed)
     if isFlying then return end
     isFlying = true
