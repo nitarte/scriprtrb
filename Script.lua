@@ -14,13 +14,27 @@ local isSpeedOn = false
 local CONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
 local speed = 1
 local noclipSpeed = 10
+local character123 = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
+local function enableNoClip1() 
+    for _, part in pairs(character123:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = false
+        end
+    end
+end
+local function disableNoClip1()
+    for _, part in pairs(character123:GetDescendants()) do
+        if part:IsA("BasePart") then
+            part.CanCollide = true
+        end
+    end
+end
 game:GetService("StarterGui"):SetCore("SendNotification", {
     Title = "УСПЕШНО",
     Text = "Успешный инжект скрипта!",
     Icon = "rbxassetid://7229442422",  
     Duration = 8  
 })
-
 function startFlying(vflySpeed)
     if isFlying then return end
     isFlying = true
@@ -273,6 +287,28 @@ local function calculateDistance(player1, player2)
     end
     return 0
 end
+local function formatPlayerName(name)
+    local upperCount = 0
+    local lowerCount = 0
+    for i = 1, #name do
+        local char = name:sub(i, i)
+        if char:match("%u") then  
+            upperCount = upperCount + 1
+        elseif char:match("%l") then
+            lowerCount = lowerCount + 1
+        end
+    end
+    if upperCount > lowerCount then
+        if #name > 23 then
+            return name:sub(1, 23) .. "..."
+        end
+    else
+        if #name > 35 then
+            return name:sub(1, 35) .. "..." 
+        end
+    end
+    return name
+end
 local function addPlayerButtons()
     local yOffset = 0
     local playerCount = 0  
@@ -287,7 +323,14 @@ local function addPlayerButtons()
             local nameButton = Instance.new("TextButton")
             nameButton.Size = UDim2.new(0, 250, 1, 0)
             nameButton.Position = UDim2.new(0, 40, 0, 0)
-            nameButton.Text = otherPlayer.Name
+			local playerNameText
+        		if otherPlayer.Name == otherPlayer.DisplayName then
+            		playerNameText = otherPlayer.Name 
+        		else
+            		playerNameText = otherPlayer.Name .. " (" .. otherPlayer.DisplayName .. ")"
+       			end
+        		playerNameText = formatPlayerName(playerNameText)
+        	nameButton.Text = playerNameText
             nameButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
             nameButton.TextColor3 = Color3.fromRGB(255, 255, 255)
             nameButton.Font = Enum.Font.Gotham
@@ -561,6 +604,16 @@ inputBox.FocusLost:Connect(function()
         warn("Invalid speed value")
 		info = "Значение не может быть меньше 0!"
 		infoMessage(info)
+    end
+end)
+game:GetService("UserInputService").InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.Space then  
+        noclip = not noclip
+        if noclip then
+            enableNoClip1()  
+        else
+            disableNoClip1() 
+        end
     end
 end)
 local function createFlagEffect(character)
