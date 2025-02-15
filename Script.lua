@@ -373,6 +373,7 @@ local function addPlayerButtons()
             local selectionBox = nil  
             local isGlowing = false 
             glowButton.MouseButton1Click:Connect(function()
+			glowButton.Visible = false
                 if otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
                     if not isGlowing then
                         selectionBox = Instance.new("SelectionBox")
