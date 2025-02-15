@@ -320,19 +320,25 @@ local function addPlayerButtons()
             playerButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
             playerButton.BorderSizePixel = 0
             playerButton.Parent = playerListFrame
+
             local nameButton = Instance.new("TextButton")
             nameButton.Size = UDim2.new(0, 250, 1, 0)
             nameButton.Position = UDim2.new(0, 40, 0, 0)
-			local playerNameText
-        		if otherPlayer.Name == otherPlayer.DisplayName then
-            		playerNameText = otherPlayer.Name 
-        		else
-            		playerNameText = otherPlayer.Name .. " (" .. otherPlayer.DisplayName .. ")"
-       			end
-        		playerNameText = formatPlayerName(playerNameText)
-        	nameButton.Text = playerNameText
+            local playerNameText
+            if otherPlayer.Name == otherPlayer.DisplayName then
+                playerNameText = otherPlayer.Name
+            else
+                playerNameText = otherPlayer.Name .. " (" .. otherPlayer.DisplayName .. ")"
+            end
+            playerNameText = formatPlayerName(playerNameText)
+            nameButton.Text = playerNameText
             nameButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-            nameButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            if player:IsFriendsWith(otherPlayer.UserId) then
+                nameButton.TextColor3 = Color3.fromRGB(0, 255, 0) 
+            else
+                nameButton.TextColor3 = Color3.fromRGB(255, 255, 255)  
+            end
+
             nameButton.Font = Enum.Font.Gotham
             nameButton.TextSize = 16
             nameButton.TextXAlignment = Enum.TextXAlignment.Left
@@ -346,6 +352,11 @@ local function addPlayerButtons()
             distanceLabel.Text = "0м"  
             distanceLabel.BackgroundTransparency = 1
             distanceLabel.TextColor3 = Color3.fromRGB(255, 255, 255) 
+			if player:IsFriendsWith(otherPlayer.UserId) then
+                distanceLabel.TextColor3 = Color3.fromRGB(0, 255, 0) 
+            else
+                distanceLabel.TextColor3 = Color3.fromRGB(255, 255, 255) 
+            end
             distanceLabel.Font = Enum.Font.Gotham
             distanceLabel.TextSize = 16
             distanceLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -405,7 +416,11 @@ local function addPlayerButtons()
             local distance = calculateDistance(player, otherPlayer)
             distanceLabel.Text = distance .. "м"
             distanceLabel.BackgroundTransparency = 1
-            distanceLabel.TextColor3 = Color3.fromRGB(255, 0, 0)  
+			if player:IsFriendsWith(otherPlayer.UserId) then
+                distanceLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+            else
+                distanceLabel.TextColor3 = Color3.fromRGB(255, 0, 0)
+            end
             distanceLabel.Font = Enum.Font.Gotham
             distanceLabel.TextSize = 24
             distanceLabel.TextXAlignment = Enum.TextXAlignment.Center
@@ -420,6 +435,7 @@ local function addPlayerButtons()
                 nameLabel.Position = UDim2.new(0, 0, 1, 0)  
                 nameLabel.Text = otherPlayer.Name
                 nameLabel.BackgroundTransparency = 1
+				
                 nameLabel.TextColor3 = Color3.fromRGB(0, 0, 0)  
                 nameLabel.TextSize = 14
                 nameLabel.Font = Enum.Font.GothamBold
@@ -436,7 +452,11 @@ local function addPlayerButtons()
                         nameLabel.Position = UDim2.new(0, 0, 1, 0)
                         nameLabel.Text = otherPlayer.Name
                         nameLabel.BackgroundTransparency = 1
-                        nameLabel.TextColor3 = Color3.fromRGB(0, 0, 0)
+						if player:IsFriendsWith(otherPlayer.UserId) then
+                		nameLabe.TextColor3 = Color3.fromRGB(0, 255, 0) 
+            			else
+                		nameLabe.TextColor3 = Color3.fromRGB(255, 255, 255) 
+            			end
                         nameLabel.TextSize = 24
                         nameLabel.Font = Enum.Font.GothamBold
                         nameLabel.TextXAlignment = Enum.TextXAlignment.Center
