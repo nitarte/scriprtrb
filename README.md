@@ -1,4 +1,4 @@
-### Скрипт + инжектер
+# Скрипт + инжектер
 ```
  loadstring(game:HttpGet("https://raw.githubusercontent.com/nitarte/scriprtrb/refs/heads/main/Script.lua", true))()
 ```
