@@ -86,18 +86,17 @@
        
 5. Проверьте статус инжектора, он должен показывать ваш аккаунт (см. фото 2).  
    - **Фото 2: Статус инжектора**  
-     - [Перейти к фото 2](ссылка_на_фото2)
-     - ![xeno 2](https://github.com/user-attachments/assets/c3049258-5cf3-4a79-b010-6e09dd449a2a)
+     - ![ФОТО2](https://github.com/user-attachments/assets/c3049258-5cf3-4a79-b010-6e09dd449a2a)
 
 
 6. Создайте новый таб для кода (или используйте старый) и вставьте туда код (см. фото 3).  
    - **Фото 3: Вставка кода в Xeno**  
-     - [Перейти к фото 3](https://github.com/user-attachments/assets/bfe8fa6d-3f0d-44a7-815f-fd78a9561eea)
+     - ![ФОТО3](https://github.com/user-attachments/assets/bfe8fa6d-3f0d-44a7-815f-fd78a9561eea)
 
 
 7. Если все прошло успешно, заходите в любой режим Roblox и нажимайте кнопку (см. фото 4).  
    - **Фото 4: Нажатие кнопки в Roblox**  
-     - [Перейти к фото 4](https://github.com/user-attachments/assets/62269349-0003-42f8-ae2f-7d558d858d5f)
+     - ![ФОТО4](https://github.com/user-attachments/assets/62269349-0003-42f8-ae2f-7d558d858d5f)
        
 
 8. **ВСЁ!**
