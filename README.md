@@ -57,7 +57,7 @@
     ![Шаг 6](https://i.postimg.cc/TP9VPm4w/image.png)
 
 7. **Шаг 7: Фан функция**
-    - Нажмите **by nitarte**, чтобы следить наделать суеты.
+    - Нажмите **by nitarte**, чтобы наделать локальной суеты.
 
     ![Шаг 7](https://i.postimg.cc/7YZ0Bfb8/fun.png)
 
