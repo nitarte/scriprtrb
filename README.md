@@ -75,6 +75,7 @@
 3. Запустите игру и наслаждайтесь всеми функциями!
 
 ### ТАк же через xeno
+#[Скачать тут](https://xenoexecutor.com/)
 ![warn](https://i.postimg.cc/vZzRG2b6/5.png)
 ```
 loadstring(game:HttpGet("https://raw.githubusercontent.com/nitarte/scriprtrb/refs/heads/main/Script.lua", true))()
