@@ -56,7 +56,7 @@
     - Нажмите **glow**, чтобы следить за игроком.
     ![Шаг 6](https://i.postimg.cc/TP9VPm4w/image.png)
 
-7. **Шаг 7: Подсветка игроков glow**
+7. # все забагалось?
     - Что бы все сбросить просто ресетнись reset
 
 ---
@@ -67,7 +67,7 @@
 3. Запустите игру и наслаждайтесь всеми функциями!
 
 ### ТАк же через xeno
-![warn!]([https://i.postimg.cc/TP9VPm4w/image.png](https://i.postimg.cc/vZzRG2b6/image.png))
+![warn](https://i.postimg.cc/vZzRG2b6/5.png)
 ```
 loadstring(game:HttpGet("https://raw.githubusercontent.com/nitarte/scriprtrb/refs/heads/main/Script.lua", true))()
 ```
